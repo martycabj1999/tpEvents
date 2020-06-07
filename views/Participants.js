@@ -1,21 +1,44 @@
 import React from 'react';
 import { View, StyleSheet, Vibration } from 'react-native'
-import { Headline, Switch } from 'react-native-paper';
+import { Headline, Switch, Button } from 'react-native-paper';
 import globalStyles from '../styles/global';
+import EventsContext from '../context/events/eventsContext';
+import { useNavigation } from '@react-navigation/native'
 
 const Participants = ({navigation}) => {
 
+    //UseNavigation
+    const navigation = useNavigation();
+    //Context
+    const { event, confirmParticipants } = useContext(EventsContext)
+
     const [isSwitchOn, setIsSwitchOn] = useState(false)
 
-    const _onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
+    const _onToggleSwitch = (part) => {
+        part.state = !isSwitchOn
+        setIsSwitchOn(!isSwitchOn)
+    };
+
+    const handleSubmit = (event) => {
+        confirmParticipants(event)
+        navigation.navigate('Inicio')
+    }
 
     return ( 
         <View style={globalStyles.container}>
-            <Headline style={globalStyles.title}>{name}</Headline>
-            <Switch
-                value={isSwitchOn}
-                onValueChange={_onToggleSwitch}
-            />
+            {   event.participants.map( part => (
+                    <>
+                        <Headline style={globalStyles.title}>{part.name}</Headline>
+                        <Switch
+                            value={isSwitchOn}
+                            onValueChange={_onToggleSwitch(part)}
+                        />
+                    </>
+                ))
+            }
+            <Button mode="contained" onPress={ () => handleSubmit() }>
+                Guardar Participantes
+            </Button>
         </View>
     );
 }

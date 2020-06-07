@@ -40,15 +40,15 @@ const EventsState = (props) => {
 
     const addParticipant = (event) => {
         dispatch({
-            type: 'CONFIRM_PARTICIPANTS',
+            type: 'ADD_PARTICIPANT',
             payload: event
         })
     }
 
-    const confirmParticipants = (id) => {
+    const confirmParticipants = (event) => {
         dispatch({
             type: 'CONFIRM_PARTICIPANTS',
-            payload: id
+            payload: event
         })
     }
 

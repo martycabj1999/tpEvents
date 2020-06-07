@@ -22,7 +22,8 @@ const NewParticipant = ({navigation, route}) => {
         }
 
         //generar el participante
-        const parcitipant = { name };
+        let state = false
+        const parcitipant = { name, state };
         event.parcitipants.push(parcitipant)
         
         //Guardar el participante

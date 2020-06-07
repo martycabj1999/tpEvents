@@ -18,7 +18,16 @@ export default (state, action) => {
         case 'ADD_PARTICIPANT':
             return {
                 ...state,
-                participants: [ ...state.participants, action.payload ]
+                event: action.payload,
+                events: state.events.filter( event => event.id !== action.payload ),
+                events: state.events.splice(1, 0, action.payload)
+            }
+        case 'CONFIRM_PARTICIPANTS':
+            return {
+                ...state,
+                event: action.payload,
+                events: state.events.filter( event => event.id !== action.payload ),
+                events: state.events.splice(1, 0, action.payload)
             }
         default:
             return state;
