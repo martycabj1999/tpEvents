@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, StyleSheet, Vibration } from 'react-native'
 import { Headline, Switch, Button } from 'react-native-paper';
 import globalStyles from '../styles/global';
 import EventsContext from '../context/events/eventsContext';
 import { useNavigation } from '@react-navigation/native'
 
-const Participants = ({navigation}) => {
+const Participants = () => {
 
     //UseNavigation
     const navigation = useNavigation();

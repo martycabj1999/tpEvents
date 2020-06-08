@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, StyleSheet, Alert } from 'react-native'
 import { Headline, Text, Subheading, Button } from 'react-native-paper';
 import globalStyles from '../styles/global';
@@ -18,13 +18,13 @@ const EventDetails = () => {
             '¿Deseas eliminar este evento?',
             'Un evento eliminado no se puede recuperar',
             [
-                { text: 'Si, Eliminar', onPress: () => deleteEvent(event.id) },
+                { text: 'Si, Eliminar', onPress: () => deleteE(event.id) },
                 { text: 'Cancelar', style: 'cancel'},
             ]
         )
     }
 
-    const deleteEvent = async (id) => {
+    const deleteE = async (id) => {
         //Funcion para eliminar
         deleteEvent(id)
         //Redireccionar

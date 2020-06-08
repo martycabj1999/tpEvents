@@ -8,7 +8,6 @@ const EventsState = (props) => {
     const initialState = {
         events: [],
         event: {},
-        participants: [],
     }
 
     //use Reducer con dispatch para ejecutar las funciones
@@ -56,7 +55,7 @@ const EventsState = (props) => {
         <EventsContext.Provider
             value={{
                 events: state.events,
-                participants: participants,
+                event: state.event,
                 deleteEvent,
                 addEvent,
                 selectEvent,

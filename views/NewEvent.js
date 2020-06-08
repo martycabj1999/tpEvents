@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { StyleSheet, View, Button as BTN } from 'react-native';
 import { TextInput, Headline, Button, Paragraph, Dialog, Portal } from 'react-native-paper'
 import globalStyles from '../styles/global'
@@ -6,7 +6,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import EventsContext from '../context/events/eventsContext';
 import { useNavigation } from '@react-navigation/native'
 
-const NewEvent = ({navigation, route}) => {
+const NewEvent = () => {
 
     //UseNavigation
     const navigation = useNavigation();
@@ -28,13 +28,13 @@ const NewEvent = ({navigation, route}) => {
     };
   
     const handleConfirm = (date) => {
-      console.warn("A date has been picked: ", date);
-      hideDatePicker();
+        setDate(date)
+        hideDatePicker();
     };
 
     const saveEvent = async () => {
         //validacion
-        if( name.trim() === '' || date.trim() === '' ){
+        if( name.trim() === '' || date === '' ){
             return setError(true);
         }
 
