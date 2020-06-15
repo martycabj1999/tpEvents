@@ -1,19 +1,20 @@
-import React, { useContext } from 'react';
-import { View, StyleSheet, Alert } from 'react-native'
+import React, { useState, useContext } from 'react';
+import { ScrollView, StyleSheet, Alert } from 'react-native'
 import { Headline, Text, Subheading, Button } from 'react-native-paper';
 import globalStyles from '../styles/global';
-import NewParticipant from './NewParticipant'
+import Participants from './Participants';
 import EventsContext from '../context/events/eventsContext';
 import { useNavigation } from '@react-navigation/native'
+import AsyncStorage from '@react-native-community/async-storage';
 
 const EventDetails = () => {
 
     //UseNavigation
     const navigation = useNavigation();
     //Context
-    const { event, deleteEvent } = useContext(EventsContext)
-
-    const viewConfirm = () => {
+    const { event, events, deleteEvent } = useContext(EventsContext)
+  
+    const viewDelete = () => {
         Alert.alert(
             '¿Deseas eliminar este evento?',
             'Un evento eliminado no se puede recuperar',
@@ -27,28 +28,36 @@ const EventDetails = () => {
     const deleteE = async (id) => {
         //Funcion para eliminar
         deleteEvent(id)
+
+        try {
+            let eventsStorage = events.filter( event => event.id != id )
+            eventsStorage = JSON.stringify(eventsStorage)
+            await AsyncStorage.setItem('events', eventsStorage)
+        } catch (error) {
+            console.error(error)
+        }
         //Redireccionar
-        navigation.navigate('Inicio')
+        navigation.navigate('Inicio') 
 
     }
-
+    
     return ( 
-        <View style={globalStyles.container}>
+        <ScrollView style={globalStyles.container}>
+            <Button 
+                style={styles.buttonDelete} 
+                mode="contained"
+                icon="close"
+                onPress={ () => viewDelete() }
+            >
+                Eliminar Evento
+            </Button>
             <Headline style={globalStyles.title}>{event.name}</Headline>
             <Text style={styles.text}><Subheading>Descripcion: {event.description}</Subheading></Text>
             <Text style={styles.text}><Subheading>Fecha: {event.date}</Subheading></Text>
 
-            <NewParticipant />
+            <Participants />
 
-            <Button 
-                style={styles.button} 
-                mode="contained"
-                icon="cancel"
-                onPress={ () => viewConfirm() }
-            >
-                Eliminar Evento
-            </Button>
-        </View>
+        </ScrollView>
     );
 }
 
@@ -57,9 +66,13 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         fontSize: 18
     },
-    button: {
-        marginTop: 100,
+    buttonDelete: {
+        marginTop: 10,
         backgroundColor: 'red'
+    },
+    button: {
+        marginTop: 10,
+        backgroundColor: 'green'
     },
     fab: {
         position: 'absolute',

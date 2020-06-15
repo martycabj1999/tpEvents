@@ -6,12 +6,32 @@ const EventsState = (props) => {
 
     //Crear state inicial
     const initialState = {
-        events: [],
+        events: [{
+            id: "aiyddp",
+            name: "martin",
+            date: "Tue Jun 30 2020 20:46:27 GMT-0300 (hora estándar de Argentina)",
+            description: "",
+            participants: [{
+                id: "t2gg55",
+                name: "martin",
+                state: true
+            }],
+            confirm: 1
+        }],
         event: {},
+        updateState: false
     }
 
     //use Reducer con dispatch para ejecutar las funciones
     const [ state, dispatch ] = useReducer(EventsReducer, initialState)
+
+    //Agregar un evento
+    const storageEvent = (form) => {
+        dispatch({
+            type: 'STORAGE_EVENT',
+            payload: form
+        })
+    }
 
     //Agregar un evento
     const addEvent = (form) => {
@@ -44,10 +64,10 @@ const EventsState = (props) => {
         })
     }
 
-    const confirmParticipants = (event) => {
+    const updateEvent = () => {
         dispatch({
-            type: 'CONFIRM_PARTICIPANTS',
-            payload: event
+            type: 'UPDATE_EVENT',
+            payload: true
         })
     }
 
@@ -56,11 +76,13 @@ const EventsState = (props) => {
             value={{
                 events: state.events,
                 event: state.event,
+                updateState: state.updateState,
                 deleteEvent,
+                storageEvent,
                 addEvent,
                 selectEvent,
                 addParticipant,
-                confirmParticipants
+                updateEvent
             }}
         >
             {props.children}

@@ -1,21 +1,24 @@
 import React, { useState, useContext } from 'react';
-import { StyleSheet, View, Button as BTN } from 'react-native';
-import { TextInput, Headline, Button, Paragraph, Dialog, Portal } from 'react-native-paper'
+import { StyleSheet, ScrollView, View, Button as BTN, FlatList } from 'react-native';
+import { TextInput, Headline, Button, Paragraph, Dialog, Portal, List, Text } from 'react-native-paper'
 import globalStyles from '../styles/global'
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import EventsContext from '../context/events/eventsContext';
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const NewEvent = () => {
 
     //UseNavigation
     const navigation = useNavigation();
     //Context
-    const { addEvent } = useContext(EventsContext)
+    const { addEvent, events } = useContext(EventsContext)
 
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
     const [date, setDate] = useState('')
+    const [participants, setParticipants] = useState([])
+    const [nameParticipant, setNameParticipant] = useState('')
     const [error, setError] = useState(false)
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
@@ -32,6 +35,28 @@ const NewEvent = () => {
         hideDatePicker();
     };
 
+    const addParticipant = async () => {
+
+        if( nameParticipant === '' ){
+            return setError(true);
+        }
+
+        let id = Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);
+        let sortParticipants = [...participants, { id, name: nameParticipant, state: false }]
+        sortParticipants = sortParticipants.sort((a, b) => {
+            if (a.name > b.name) {
+                return 1;
+              }
+              if (a.name < b.name) {
+                return -1;
+              }
+              // a must be equal to b
+              return 0;
+        })
+        setParticipants(sortParticipants);
+        setNameParticipant("");
+    };
+
     const saveEvent = async () => {
         //validacion
         if( name.trim() === '' || date === '' ){
@@ -40,11 +65,20 @@ const NewEvent = () => {
 
         //generar el evento
         let id = Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);
-        let participants = []
-        const event = { id, name, date, description, participants };
+        let d = date.toString()
+        const event = { id, name, date: d, description, participants, confirm: 0 };
 
         //guardar el evento en la API
-        addEvent(event)
+        await addEvent(event)
+
+        try {
+            let eventsStorage = events
+            eventsStorage.push(event)
+            eventsStorage = JSON.stringify(eventsStorage)
+            await AsyncStorage.setItem('events', eventsStorage)
+        } catch (error) {
+            console.error(error)
+        }
 
         //redireccionar
         navigation.navigate('Inicio');
@@ -54,9 +88,9 @@ const NewEvent = () => {
         setDescription('');
         setDate('');
     }
-
+    
     return ( 
-        <View style={globalStyles.container} >
+        <ScrollView style={globalStyles.container} >
 
             <Headline style={globalStyles.title}>Añadir Nuevo Evento</Headline>
 
@@ -79,12 +113,37 @@ const NewEvent = () => {
                 <DateTimePickerModal
                     isVisible={isDatePickerVisible}
                     mode="date"
+                    locale="es_AR"
                     onConfirm={handleConfirm}
                     onCancel={hideDatePicker}
                 />
             </View>
 
-            <Button icon="pencil-circle" mode="contained" onPress={ () => saveEvent() }>
+            <Text>Participantes</Text>
+            <FlatList 
+                data={participants}
+                keyExtractor={ person => (person.id) }
+                renderItem={ (person) => (
+                    <>
+                        <List.Item 
+                            title={person.item.name}
+                        />
+                    </>
+                )}
+            />
+
+            <TextInput 
+                label="Nombre"
+                style={style.input}
+                value={nameParticipant}
+                onChangeText={ (text) => setNameParticipant(text) }
+            />
+
+            <Button icon="pencil-circle" mode="contained" onPress={ () => addParticipant() }>
+                Añadir Participante
+            </Button>
+
+            <Button style={style.button} icon="check" mode="contained" onPress={ () => saveEvent() }>
                 Guardar Evento
             </Button>
 
@@ -103,7 +162,7 @@ const NewEvent = () => {
                 </Dialog>
             </Portal>
 
-        </View>
+        </ScrollView>
     );
 }
 
@@ -111,7 +170,11 @@ const style = StyleSheet.create({
     input: {
         marginBottom: 20,
         backgroundColor: 'transparent'
-    }
+    },
+    button: {
+        marginTop: 10,
+        backgroundColor: 'green'
+    },
 })
  
 export default NewEvent;

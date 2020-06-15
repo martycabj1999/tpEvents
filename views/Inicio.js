@@ -1,19 +1,40 @@
-import React, { useState, useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native'
-import { List, Headline, Button, FAB } from 'react-native-paper'
+import { Headline, Button, Text, FAB } from 'react-native-paper'
 import globalStyles from '../styles/global'
 import EventsContext from '../context/events/eventsContext';
 import { useNavigation } from '@react-navigation/native'
+import AsyncStorage from '@react-native-community/async-storage';
 
 const Inicio = () => {
 
     //UseNavigation
     const navigation = useNavigation();
     //Context
-    const { events, selectEvent } = useContext(EventsContext)
+    const { events, updateState, selectEvent, storageEvent } = useContext(EventsContext)
 
+    useEffect(() => {
+        currentEvents()
+    }, [])
+
+    useEffect(() => {
+        eventsDou()
+    }, [updateState])
+
+    const currentEvents = async () => {
+        let currentE = await AsyncStorage.getItem('events')
+        currentE = JSON.parse(currentE)
+        currentE ? await storageEvent(currentE) : await storageEvent(events)
+    }
+
+    const eventsDou = async () => {
+        console.log(events)
+        await storageEvent(events)
+    }
+
+    console.log(updateState)
     const eventDetail = (id) => {
-        let event = events.filter( event => event.id == id )
+        let event = events.find( event => event.id === id )
         selectEvent(event)
         navigation.navigate('EventDetails') 
     }
@@ -27,16 +48,30 @@ const Inicio = () => {
 
             <Headline style={globalStyles.title}>{ events.length > 0 ? "Eventos" : "No hay eventos" }</Headline>
 
-            <FlatList 
+            { events.length > 0 ? <FlatList 
                 data={events}
                 keyExtractor={ event => (event.id) }
                 renderItem={ (event) => (
-                    <List.Item 
-                        title={event.name}
-                        onPress={ () => eventDetail(event.id) }
-                    />
-                ) }
-            />
+                    <View >
+                        <Text 
+                            onPress={ () => eventDetail(event.item.id) } 
+                            style={styles.text}
+                        >
+                            {event.item.name} {event.item.participants ? `(${event.item.participants.length} Participantes)` : null }
+                        </Text>
+                        <Text
+                            onPress={ () => eventDetail(event.item.id) }
+                        >
+                            Confirmados: {event.item.confirm}
+                        </Text>
+                        <Text
+                            onPress={ () => eventDetail(event.item.id) }
+                        >
+                            Fecha: {event.item.date}
+                        </Text>
+                    </View>
+                )}
+            /> : null }
 
             <FAB 
                 icon="plus" 
@@ -54,6 +89,19 @@ const styles = StyleSheet.create({
         margin: 20,
         right: 0,
         bottom: 20
+    },
+    text: {
+        marginBottom: 20,
+        fontSize: 18,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        textAlign: 'center'
+    },
+    textParticipants: {
+        marginBottom: 20,
+        fontSize: 15,
+        fontWeight: 'bold',
+        textAlign: 'center'
     }
 })
 

@@ -1,5 +1,10 @@
 export default (state, action) => {
     switch(action.type) {
+        case 'STORAGE_EVENT':
+            return {
+                ...state,
+                events: action.payload 
+            }
         case 'ADD_EVENT':
             return {
                 ...state,
@@ -15,19 +20,10 @@ export default (state, action) => {
                 ...state,
                 event: action.payload
             }
-        case 'ADD_PARTICIPANT':
+        case 'UPDATE_EVENT':
             return {
                 ...state,
-                event: action.payload,
-                events: state.events.filter( event => event.id !== action.payload ),
-                events: state.events.splice(1, 0, action.payload)
-            }
-        case 'CONFIRM_PARTICIPANTS':
-            return {
-                ...state,
-                event: action.payload,
-                events: state.events.filter( event => event.id !== action.payload ),
-                events: state.events.splice(1, 0, action.payload)
+                updateState: action.payload,
             }
         default:
             return state;
