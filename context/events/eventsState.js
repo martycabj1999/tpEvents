@@ -8,12 +8,12 @@ const EventsState = (props) => {
     const initialState = {
         events: [{
             id: "aiyddp",
-            name: "martin",
+            name: "Boda",
             date: "Tue Jun 30 2020 20:46:27 GMT-0300 (hora estándar de Argentina)",
             description: "",
             participants: [{
                 id: "t2gg55",
-                name: "martin",
+                name: "franco",
                 state: true
             }],
             confirm: 1

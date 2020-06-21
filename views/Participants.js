@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { View, StyleSheet, Alert, Switch, FlatList } from 'react-native'
+import { View, StyleSheet, Alert, Switch, FlatList, Vibration, Platform } from 'react-native'
 import { Text, Button, List } from 'react-native-paper';
 import globalStyles from '../styles/global';
 import EventsContext from '../context/events/eventsContext';
@@ -15,12 +15,29 @@ const Participants = () => {
     const [ people, setPeople] = useState(event.participants);
     const [ currentEvent, setCurrentEvent] = useState(event.participants);
 
-    const toggleSwitch = (id, state) => {
+    const ONE_SECOND_IN_MS = 1000;
+
+    const PATTERN = [
+        1 * ONE_SECOND_IN_MS,
+        2 * ONE_SECOND_IN_MS,
+        3 * ONE_SECOND_IN_MS
+    ];
+
+    const PATTERN_DESC =
+    Platform.OS === "android"
+      ? "wait 1s, vibrate 2s, wait 3s"
+      : "wait 1s, vibrate, wait 2s, vibrate, wait 3s";
+
+    const toggleSwitch = (id) => {
+        Vibration.vibrate(10 * ONE_SECOND_IN_MS)
+
         let newPeople = people.filter(person => person.id !== id)
         let newState = people.find(person => person.id === id)
+
         newState.state = !newState.state
         event.confirm = people.filter(person => person.state == true).length
         newPeople.push(newState)
+
         newPeople = newPeople.sort((a, b) => {
             if (a.name > b.name) {
                 return 1;
@@ -31,16 +48,17 @@ const Participants = () => {
               // a must be equal to b
               return 0;
         })
+
         setPeople(newPeople)
         setCurrentEvent(event)
     };
 
-    const viewConfirm = () => {
+    const viewConfirm = (id) => {
         Alert.alert(
             '¿Deseas confirmar los asistentes?',
             'El evento recibira esa modificacion',
             [
-                { text: 'Si, Confirmar', onPress: () => confirmParticipants() },
+                { text: 'Si, Confirmar', onPress: () => confirmParticipants(id) },
                 { text: 'Cancelar', style: 'cancel'},
             ]
         )
@@ -50,9 +68,11 @@ const Participants = () => {
     
         try {
             let eventsStorage = events.filter( event => event.id !== id )
-            eventsStorage = currentEvent
+
+            eventsStorage.push(currentEvent)
             eventsStorage = JSON.stringify(eventsStorage)
-            updateEvent()
+            
+            await updateEvent()
             await AsyncStorage.setItem('events', eventsStorage)
         } catch (error) {
             console.error(error)
@@ -88,7 +108,7 @@ const Participants = () => {
                 style={styles.button} 
                 mode="contained"
                 icon="check"
-                onPress={ () => viewConfirm() }
+                onPress={ () => viewConfirm(event.id) }
             >
                 Confirmar Participantes
             </Button>

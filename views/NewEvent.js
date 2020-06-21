@@ -43,6 +43,7 @@ const NewEvent = () => {
 
         let id = Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);
         let sortParticipants = [...participants, { id, name: nameParticipant, state: false }]
+
         sortParticipants = sortParticipants.sort((a, b) => {
             if (a.name > b.name) {
                 return 1;
@@ -53,8 +54,10 @@ const NewEvent = () => {
               // a must be equal to b
               return 0;
         })
+
         setParticipants(sortParticipants);
         setNameParticipant("");
+
     };
 
     const saveEvent = async () => {
@@ -73,6 +76,7 @@ const NewEvent = () => {
 
         try {
             let eventsStorage = events
+            
             eventsStorage.push(event)
             eventsStorage = JSON.stringify(eventsStorage)
             await AsyncStorage.setItem('events', eventsStorage)
@@ -87,6 +91,7 @@ const NewEvent = () => {
         setName('');
         setDescription('');
         setDate('');
+        
     }
     
     return ( 

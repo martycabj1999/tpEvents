@@ -18,7 +18,7 @@ const Inicio = () => {
     }, [])
 
     useEffect(() => {
-        eventsDou()
+        storage()
     }, [updateState])
 
     const currentEvents = async () => {
@@ -27,15 +27,13 @@ const Inicio = () => {
         currentE ? await storageEvent(currentE) : await storageEvent(events)
     }
 
-    const eventsDou = async () => {
-        console.log(events)
+    const storage = async () => {
         await storageEvent(events)
     }
 
-    console.log(updateState)
-    const eventDetail = (id) => {
+    const eventDetail = async (id) => {
         let event = events.find( event => event.id === id )
-        selectEvent(event)
+        await selectEvent(event)
         navigation.navigate('EventDetails') 
     }
 

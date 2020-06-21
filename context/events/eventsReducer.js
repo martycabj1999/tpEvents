@@ -3,7 +3,7 @@ export default (state, action) => {
         case 'STORAGE_EVENT':
             return {
                 ...state,
-                events: action.payload 
+                events: action.payload
             }
         case 'ADD_EVENT':
             return {

@@ -30,9 +30,11 @@ const EventDetails = () => {
         deleteEvent(id)
 
         try {
+            
             let eventsStorage = events.filter( event => event.id != id )
             eventsStorage = JSON.stringify(eventsStorage)
             await AsyncStorage.setItem('events', eventsStorage)
+
         } catch (error) {
             console.error(error)
         }
@@ -55,7 +57,7 @@ const EventDetails = () => {
             <Text style={styles.text}><Subheading>Descripcion: {event.description}</Subheading></Text>
             <Text style={styles.text}><Subheading>Fecha: {event.date}</Subheading></Text>
 
-            <Participants />
+            {event.participants.length > 0 ? <Participants /> : <Text style={styles.text}>No hay participantes</Text> }
 
         </ScrollView>
     );
